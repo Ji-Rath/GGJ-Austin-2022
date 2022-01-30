@@ -74,7 +74,7 @@ void APortalCharacter::Tick(float DeltaTime)
 	UpdateMouseMovement(DeltaTime);
 
 	// Update physics handle location if something is being held.
-	if (physicsHandle->GetGrabbedComponent() != nullptr)
+	if (physicsHandle && physicsHandle->GetGrabbedComponent() != nullptr)
 	{
 		// Update handle offset.
 		FVector newLoc = camera->GetComponentTransform().TransformPositionNoScale(originalRelativeLocation);
@@ -86,8 +86,11 @@ void APortalCharacter::Tick(float DeltaTime)
 	currLinVel = GetCapsuleComponent()->GetPhysicsLinearVelocity();
 	currRotVel = GetCapsuleComponent()->GetPhysicsAngularVelocityInDegrees();
 
-	// Update last location.
-	lastLocation = camera->GetComponentLocation();
+	if (camera)
+	{
+		// Update last location.
+		lastLocation = camera->GetComponentLocation();
+	}
 
 	if (doubleJump && jumped && IsGrounded())
 	{
@@ -103,19 +106,19 @@ void APortalCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	// Setup action bindings.
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &APortalCharacter::JumpAction<true>);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &APortalCharacter::JumpAction<false>);
-	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &APortalCharacter::RunAction<true>);
-	PlayerInputComponent->BindAction("Run", IE_Released, this, &APortalCharacter::RunAction<false>);
-	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &APortalCharacter::CrouchAction<true>);
-	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &APortalCharacter::CrouchAction<false>);
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APortalCharacter::InteractAction<true>);
-	PlayerInputComponent->BindAction("Interact", IE_Released, this, &APortalCharacter::InteractAction<false>);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APortalCharacter::FireAction<true>);
-	PlayerInputComponent->BindAction("Fire", IE_Released, this, &APortalCharacter::FireAction<false>);
+	//PlayerInputComponent->BindAction("Run", IE_Pressed, this, &APortalCharacter::RunAction<true>);
+	//PlayerInputComponent->BindAction("Run", IE_Released, this, &APortalCharacter::RunAction<false>);
+	//PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &APortalCharacter::CrouchAction<true>);
+	//PlayerInputComponent->BindAction("Crouch", IE_Released, this, &APortalCharacter::CrouchAction<false>);
+	//PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APortalCharacter::InteractAction<true>);
+	//PlayerInputComponent->BindAction("Interact", IE_Released, this, &APortalCharacter::InteractAction<false>);
+	//PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APortalCharacter::FireAction<true>);
+	//PlayerInputComponent->BindAction("Fire", IE_Released, this, &APortalCharacter::FireAction<false>);
 
 	// Setup axis bindings.
 	PlayerInputComponent->BindAxis("MoveForward", this, &APortalCharacter::Forward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &APortalCharacter::Right);
-	PlayerInputComponent->BindAxis("Turn", this, &APortalCharacter::Turn);
+	PlayerInputComponent->BindAxis("LookRight", this, &APortalCharacter::Turn);
 	PlayerInputComponent->BindAxis("LookUp", this, &APortalCharacter::LookUp);
 }
 
@@ -312,10 +315,11 @@ void APortalCharacter::ReturnToOrientation()
 void APortalCharacter::UpdateMouseMovement(float deltaTime)
 {
 	// Get current mouse axis values.
-	float mouseX = InputComponent->GetAxisValue("Turn");
+	float mouseX = InputComponent->GetAxisValue("LookRight");
 	float mouseY = InputComponent->GetAxisValue("LookUp");
 
 	// Camera movement pitch.
+	if (!camera) { return; }
 	FRotator newRelativeCameraRot = camera->GetRelativeTransform().Rotator();
 	newRelativeCameraRot.Pitch += (mouseY * mouseSpeed);
 	newRelativeCameraRot.Yaw = 0.0f;
