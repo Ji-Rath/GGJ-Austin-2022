@@ -1,3 +1,6 @@
 [submodule "Plugins/InteractSystem"]
 	path = Plugins/InteractSystem
 	url = https://github.com/Ji-Rath/UEInteractSystem
+[submodule "Plugins/BetterPortals"]
+	path = Plugins/BetterPortals
+	url = https://github.com/Ji-Rath/BetterPortalsPlugin
